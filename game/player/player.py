@@ -47,16 +47,13 @@ class Player(object):
 
 					if cell==player_num:
 						self.board[i][j] = 0
-						temp_moves = self.__valid_add_moves(player_num, move_type='step')
+						temp_moves = self.__valid_add_moves(player_num, move_type='step', old_x=i,old_y=j)
 						moves.extend(temp_moves)
-
 						self.board[i][j] = player_num
-
-		print len(moves)
 
 		return moves
 
-	def __valid_add_moves(self, player_num, move_type='add'):
+	def __valid_add_moves(self, player_num, move_type='add', old_x=-1, old_y=-1):
 		moves = []
 
 		for i in range(8):
@@ -77,33 +74,40 @@ class Player(object):
 				chip = self.board[i][j]
 				if chip==0:
 					#check surrounding spaces for too many chips
-					num_neighbor = self.num_surround(player_num, i, j)
 
-					if num_neighbor<2:
-						#then we have a valid move
-
-						move = (player_num, move_type, -1, -1, i, j)
-
+					if self.is_valid(player_num,i,j):
+						move = (player_num, move_type, old_x, old_y,  i, j)
 						moves.append(move)
 
 		return moves
 
+	def is_valid(self, player_num, i, j):
+		if self.board[i][j]!=0:
+			return False
+		else:
+			self.board[i][j] = player_num
+			for k in range(8):
+				for l in range(8):	
+					num_neighbors = self.num_surround(player_num, k, l)
+					
+					if num_neighbors>2:
+						self.board[i][j] = 0
+						return False
+
+		self.board[i][j] = 0
+		return True
 
 	def num_surround(self, player_num, i, j):
-
-		max_num = -1
-		for k in range(i-2, i+3):
+		number = 0
+		for k in range(i-1, i+2):
 			if k<0 or k>7:
 				continue
-
-			number = 0
-			for l in range(j-2, j+3):
+			
+			for l in range(j-1, j+2):
 				if l<0 or l>7:
 					continue
 
 				if self.board[k][l]==player_num:
 					number += 1
 
-			max_num = max(max_num, number)
-
-		return max_num
+		return number

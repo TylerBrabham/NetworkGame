@@ -14,7 +14,6 @@ class MachinePlayer(Player):
 
 class RandomPlayer(Player):
 	
-	
 	def __init__(self, color):
 		self.color = color
 		self.num_chips = 0
